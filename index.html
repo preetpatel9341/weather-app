@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anytime Weather</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="./manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="scrollable-container">
+    <video id="background-video" autoplay loop muted></video>
+    <div class="app-container">
+      <div class="input-section">
+        <h2>☀️ Anytime Weather</h2>
+        <input id="cityInput" placeholder="Enter City Name" list="citySuggestions">
+        <datalist id="citySuggestions"></datalist>
+        <div class="unit-toggle">
+          <label><input type="radio" name="unit" value="imperial" checked> °F</label>
+          <label><input type="radio" name="unit" value="metric"> °C</label>
+        </div>
+        <button onclick="getWeather()">🔍 Search</button>
+        <button onclick="getLocation()">📍 Use Current Location</button>
+      </div>
+
+      <div id="loader" class="loader hidden">
+        <svg class="spinner" viewBox="0 0 50 50">
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+        </svg>
+      </div>
+
+      <div id="loader-location" class="loader hidden">
+        <svg class="spinner" viewBox="0 0 50 50">
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+        </svg>
+      </div>
+
+      <div id="weatherDisplay" class="weather-section hidden">
+        <div class="weather-card">
+          <img id="weatherIcon" alt="Weather Icon">
+          <div class="temp"><span id="temperature"></span><span id="unit">°F</span></div>
+          <div id="cityName" class="city-name"></div>
+          <label class="fav-toggle">
+            <input type="checkbox" id="favoriteToggle">
+            <span>❤️ Save as Favorite</span>
+          </label>
+        </div>
+
+        <div id="forecastContainer" class="forecast-section hidden"></div>
+        <button onclick="toggleForecast()" class="forecast-btn">📅 5-Day Forecast</button>
+      </div>
+      <!-- Moved here for proper alignment -->
+      <div id="favoritesTab" class="favorites-tab">
+        <h3 class="visible-heading">Favourites ❤️</h3> 
+        <!-- Favorite cities will be dynamically added here -->
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.error('Service Worker registration failed:', error);
+          });
+      });
+    } else {
+      console.warn('Service Worker not registered. HTTPS is required.');
+    }
+  </script>
+</body>
+</html>
