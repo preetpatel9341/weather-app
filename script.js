@@ -98,11 +98,12 @@ document.getElementById("cityInput").addEventListener("keypress", (event) => {
 
 function displayWeather(data, unit) {
   const icon = data.weather[0].icon;
-  const weatherMain = data.weather[0].main.toLowerCase();
+  const weatherMain = data.weather[0].main; // Get the weather type (e.g., Clear, Rain)
+  const weatherDescription = data.weather[0].description; // Get a more detailed description
   document.getElementById("weatherIcon").src = `http://openweathermap.org/img/wn/${icon}@2x.png`;
   document.getElementById("temperature").textContent = Math.round(data.main.temp);
   document.getElementById("unit").textContent = unit === "metric" ? "°C" : "°F";
-  document.getElementById("cityName").textContent = data.name;
+  document.getElementById("cityName").textContent = `${data.name} - ${weatherMain}`; // Add weather type next to the city name
 
   const favToggle = document.getElementById("favoriteToggle");
   favToggle.checked = localStorage.getItem("favorite") === data.name;
@@ -118,8 +119,8 @@ function displayWeather(data, unit) {
     updateFavoritesTab();
   };
 
-  setBackgroundVideo(weatherMain);
-  animateWeatherIcon(weatherMain);
+  setBackgroundVideo(weatherMain.toLowerCase());
+  animateWeatherIcon(weatherMain.toLowerCase());
   document.getElementById("weatherDisplay").classList.remove("hidden");
   document.getElementById("weatherDisplay").classList.add("visible");
 }
