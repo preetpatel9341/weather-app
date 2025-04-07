@@ -138,7 +138,7 @@ function removeFromFavorites(city) {
   localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
 }
 
-function updateFavoritesTab() {
+async function updateFavoritesTab() {
   const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
   const favoritesTab = document.getElementById("favoritesTab");
   favoritesTab.innerHTML = ""; // Clear existing content
@@ -148,7 +148,7 @@ function updateFavoritesTab() {
     return;
   }
 
-  favorites.forEach(city => {
+  for (const city of favorites) {
     const div = document.createElement("div");
     div.className = "favorite-item";
 
@@ -160,6 +160,10 @@ function updateFavoritesTab() {
       getWeather();
     };
 
+    const weatherInfo = document.createElement("span");
+    weatherInfo.className = "favorite-weather";
+    weatherInfo.textContent = "Loading...";
+
     const removeIcon = document.createElement("span");
     removeIcon.innerHTML = "❌";
     removeIcon.className = "remove-favorite-icon";
@@ -169,9 +173,27 @@ function updateFavoritesTab() {
     };
 
     div.appendChild(cityName);
+    div.appendChild(weatherInfo);
     div.appendChild(removeIcon);
     favoritesTab.appendChild(div);
-  });
+
+    // Fetch current weather for the city
+    try {
+      const unit = document.querySelector('input[name="unit"]:checked').value;
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${unit}&appid=${API_KEY}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        weatherInfo.textContent = `${Math.round(data.main.temp)}${unit === "metric" ? "°C" : "°F"} - ${data.weather[0].main}`;
+      } else {
+        weatherInfo.textContent = "Error fetching weather";
+      }
+    } catch (error) {
+      console.error(`Error fetching weather for ${city}:`, error);
+      weatherInfo.textContent = "Error fetching weather";
+    }
+  }
 }
 
 async function loadForecast(city, unit) {
