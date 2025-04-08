@@ -31,7 +31,9 @@ async function getCurrentLocationWeather() {
           const response = await fetch(
             `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${unit}&appid=${API_KEY}`
           );
-          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+          }
           const text = await response.text();
           const data = text ? JSON.parse(text) : {};
           displayWeather(data, unit);
@@ -74,10 +76,12 @@ async function getWeather() {
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${unit}&appid=${API_KEY}`
     );
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
-    const data = await response.json();
-    if (!data || Object.keys(data).length === 0) throw new Error("Invalid data received from API.");
 
+    if (!response.ok) {
+      throw new Error(`City not found: ${response.statusText}`);
+    }
+
+    const data = await response.json();
     displayWeather(data, unit);
     loadForecast(city, unit);
   } catch (err) {
@@ -183,7 +187,9 @@ async function updateFavoritesTab() {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${unit}&appid=${API_KEY}`
       );
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+      }
       const text = await response.text();
       const data = text ? JSON.parse(text) : {};
       weatherInfo.textContent = `${Math.round(data.main.temp)}${unit === "metric" ? "°C" : "°F"} - ${data.weather[0].main}`;
@@ -204,7 +210,9 @@ async function loadForecast(city, unit) {
     const res = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=${unit}&appid=${API_KEY}`
     );
-    if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status} - ${res.statusText}`);
+    }
     const text = await res.text();
     const data = text ? JSON.parse(text) : {};
     const forecastContainer = document.getElementById("forecastContainer");
